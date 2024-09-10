@@ -53,6 +53,9 @@ const PlumTrees = () => {
     let prevSteps: Function[] = [];
     let iterations = 0;
 
+    let lastTime = performance.now()
+    const interval = 1000 / 40
+
     const step = (x: number, y: number, rad: number) => {
       const length = random() * len;
       const [nx, ny] = polar2cart(x, y, length, rad);
@@ -72,9 +75,14 @@ const PlumTrees = () => {
     };
 
     const frame = () => {
+      if (performance.now() - lastTime < interval) {
+        requestAnimationFrame(frame);
+        return
+      }
       iterations += 1;
       prevSteps = steps;
       steps = [];
+      lastTime = performance.now()
 
       if (!prevSteps.length) {
         // setStopped(true);
