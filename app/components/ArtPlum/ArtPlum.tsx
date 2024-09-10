@@ -1,12 +1,14 @@
 "use client"
 
+import { useWindowSize } from '@/app/hooks/useWindowSize';
 import { useEffect, useRef, useState } from 'react';
 
 const PlumTrees = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [init, setInit] = useState(5);
-  const [len, setLen] = useState(5);
-  const [stopped, setStopped] = useState(false);
+  const windowSize = useWindowSize(200)
+  
+  const init  = 5, len = 5
+  // const [stopped, setStopped] = useState(false);
 
   const r180 = Math.PI;
   const r90 = Math.PI / 2;
@@ -26,6 +28,8 @@ const PlumTrees = () => {
     // @ts-expect-error vendor
     const bsr = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
 
+    console.log(_dpi , dpr, bsr);
+    
     const dpi = _dpi || dpr / bsr;
 
     canvas.style.width = `${width}px`;
@@ -39,8 +43,11 @@ const PlumTrees = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current!;
-    const { ctx } = initCanvas(canvas, window.innerWidth, window.innerHeight);
-    const { width, height } = canvas;
+    console.log('windowSize', windowSize);
+    
+    const { ctx, dpi } = initCanvas(canvas, windowSize.width, windowSize.height);
+    const width = canvas.width
+    const height = canvas.height
 
     let steps: Function[] = [];
     let prevSteps: Function[] = [];
@@ -70,7 +77,7 @@ const PlumTrees = () => {
       steps = [];
 
       if (!prevSteps.length) {
-        setStopped(true);
+        // setStopped(true);
         return;
       }
       prevSteps.forEach((i) => i());
@@ -78,25 +85,28 @@ const PlumTrees = () => {
     };
 
     const start = () => {
-      setStopped(false);
+      // setStopped(false);
       iterations = 0;
       ctx.clearRect(0, 0, width, height);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = '#66666620';
+      ctx.strokeStyle = '#77777725';
       prevSteps = [];
       steps = [
-        () => step(0, random() * height, 0),
-        () => step(width, random() * height, r180),
-        () => step(random() * width, 0, r90),
-        () => step(random() * width, height, -r90),
+        () => step(random() * windowSize.width, 0, r90),
+        () => step(random() * windowSize.width, windowSize.height, -r90),
+        () => step(0, random() * windowSize.height, 0),
+        () => step(windowSize.width, random() * windowSize.height, r180),
       ];
+      if (windowSize.width < 500) 
+        steps.slice(0, 2)
       frame();
     };
 
     start();
-  }, [init, len]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [windowSize]);
 
-  return <canvas ref={canvasRef} width="400" height="400" className='fixed bottom-0 left-0 top-0 right-0 -z-10' />;
+  return <canvas ref={canvasRef} className='fixed bottom-0 left-0 top-0 right-0 -z-10' />;
 };
 
 export default PlumTrees;
