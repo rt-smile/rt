@@ -7,12 +7,18 @@ const PlumTrees = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const windowSize = useWindowSize(200)
   
-  const init  = 5, len = 5
+  const len = 6
   // const [stopped, setStopped] = useState(false);
 
   const r180 = Math.PI;
   const r90 = Math.PI / 2;
   const r15 = Math.PI / 12;
+  const color = '#88888825'
+  const MIN_BRANCH = 30
+  /**
+   * 0.2 - 0.8
+   */
+  const randomMiddle = () => random() * 0.6 + 0.2
 
   const { random } = Math;
 
@@ -51,13 +57,14 @@ const PlumTrees = () => {
 
     let steps: Function[] = [];
     let prevSteps: Function[] = [];
-    let iterations = 0;
+    // let iterations = 0;
 
     let lastTime = performance.now()
-    const interval = 1000 / 40
+    const interval = 1000 / 40  // 50fps
 
-    const step = (x: number, y: number, rad: number) => {
+    const step = (x: number, y: number, rad: number, counter: { value: number } = { value: 0 }) => {
       const length = random() * len;
+      counter.value += 1
       const [nx, ny] = polar2cart(x, y, length, rad);
 
       ctx.beginPath();
@@ -68,10 +75,20 @@ const PlumTrees = () => {
       const rad1 = rad + random() * r15;
       const rad2 = rad - random() * r15;
 
+      // out of bounds
       if (nx < -100 || nx > width + 100 || ny < -100 || ny > height + 100) return;
 
-      if (iterations <= init || random() > 0.5) steps.push(() => step(nx, ny, rad1));
-      if (iterations <= init || random() > 0.5) steps.push(() => step(nx, ny, rad2));
+      // if (iterations <= init || random() > 0.5) steps.push(() => step(nx, ny, rad1));
+      // if (iterations <= init || random() > 0.5) steps.push(() => step(nx, ny, rad2));
+      const rate = counter.value <= MIN_BRANCH
+        ? 0.8
+        : 0.5
+      // left branch
+      if (random() < rate)
+        steps.push(() => step(nx, ny, rad1, counter))
+      // right branch
+      if (random() < rate)
+        steps.push(() => step(nx, ny, rad2, counter))
     };
 
     const frame = () => {
@@ -79,7 +96,7 @@ const PlumTrees = () => {
         requestAnimationFrame(frame);
         return
       }
-      iterations += 1;
+      // iterations += 1;
       prevSteps = steps;
       steps = [];
       lastTime = performance.now()
@@ -88,22 +105,29 @@ const PlumTrees = () => {
         // setStopped(true);
         return;
       }
-      prevSteps.forEach((i) => i());
+      // Execute all the steps from the previous frame
+      prevSteps.forEach((i) => {
+        // 50% chance to keep the step for the next frame, to create a more organic look
+        if (random() < 0.5)
+          steps.push(i)
+        else
+          i()
+      })
       requestAnimationFrame(frame);
     };
 
     const start = () => {
       // setStopped(false);
-      iterations = 0;
+      // iterations = 0;
       ctx.clearRect(0, 0, width, height);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = '#77777725';
+      ctx.strokeStyle = color;
       prevSteps = [];
       steps = [
-        () => step(random() * windowSize.width, 0, r90),
-        () => step(random() * windowSize.width, windowSize.height, -r90),
-        () => step(0, random() * windowSize.height, 0),
-        () => step(windowSize.width, random() * windowSize.height, r180),
+        () => step(randomMiddle() * windowSize.width, -5, r90),
+        () => step(randomMiddle() * windowSize.width, windowSize.height + 5, -r90),
+        () => step(-5, randomMiddle() * windowSize.height, 0),
+        () => step(windowSize.width + 5, randomMiddle() * windowSize.height, r180),
       ];
       if (windowSize.width < 500) 
         steps.slice(0, 2)
@@ -114,7 +138,14 @@ const PlumTrees = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [windowSize]);
 
-  return <canvas ref={canvasRef} className='fixed bottom-0 left-0 top-0 right-0 -z-10' />;
+  return (
+    // <div 
+    //   className='fixed bottom-0 left-0 top-0 right-0 -z-10 pointer-events-none print:hidden'
+    //   style={{maskImage: 'radial-gradient(circle, transparent, black)', WebkitMaskImage: 'radial-gradient(circle, transparent, black)'}}
+    // >
+      <canvas ref={canvasRef} className='fixed bottom-0 left-0 top-0 right-0 -z-10 pointer-events-none print:hidden' />
+    // </div>
+  )
 };
 
 export default PlumTrees;
