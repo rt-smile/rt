@@ -4,9 +4,17 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import markdownIt from 'markdown-it';
-import { ArtPlum } from "../components/index";
+// import { ArtPlum } from "../components/index";
+import Shiki from '@shikijs/markdown-it'
 
-const md = new markdownIt();
+const md = new markdownIt({html: true});
+
+md.use(await Shiki({
+  themes: {
+    light: 'vitesse-light',
+    dark: 'vitesse-dark',
+  }
+}))
 
 export default async function Post({ params }: any) {
   const { slug } = params;
@@ -25,7 +33,7 @@ console.log(fileContents);
         <h1>{data.title}</h1>
         <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
       </div>
-      <ArtPlum />
+      {/* <ArtPlum /> */}
     </>
   );
 }

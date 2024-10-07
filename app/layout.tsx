@@ -1,15 +1,9 @@
 // File: layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import './style/markdown.css'
 import './style/prose.css'
-import { Header } from './components/index'
-import dynamic from 'next/dynamic';
-
-// const ArtPlum = dynamic(() => import('./components/ArtPlum/ArtPlum'), { ssr: false });
-
-const inter = Inter({ subsets: ["latin"] });
+import ClientLayout from "./components/ClientLayout/ClientLayout";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,16 +15,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // console.log(inter.className);
   
-  return (
-    <html lang="en" className="h-full">
-      <body className={`shiki ${inter.className} flex flex-col h-full`}>
-        <Header />
-        <main className="grow h-0 p-4">
-          {children}
-        </main>
-      </body>
-    </html>
-  );
+  return <ClientLayout>{children}</ClientLayout>
+  
 }

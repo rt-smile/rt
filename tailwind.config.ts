@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+const { addIconSelectors, addDynamicIconSelectors } = require('@iconify/tailwind');
 
 const config: Config = {
   content: [
@@ -15,6 +16,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // addIconSelectors(['mdi', 'mdi-light']),
+    addDynamicIconSelectors()
+  ],
 };
 export default config;

@@ -34,7 +34,7 @@ const PlumTrees = () => {
     // @ts-expect-error vendor
     const bsr = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
 
-    console.log(_dpi , dpr, bsr);
+    // console.log(_dpi , dpr, bsr);
     
     const dpi = _dpi || dpr / bsr;
 
@@ -49,7 +49,6 @@ const PlumTrees = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current!;
-    console.log('windowSize', windowSize);
     
     const { ctx, dpi } = initCanvas(canvas, windowSize.width, windowSize.height);
     const width = canvas.width

@@ -1,6 +1,9 @@
+"use client"
+import {useTheme} from '@/app/hooks/useTheme';
 import Link from 'next/link';
 
 export default function Header() {
+  const {toggleTheme} = useTheme()
   return (
     <header className=" p-4">
       <nav className="container mx-auto flex justify-between items-center">
@@ -17,6 +20,9 @@ export default function Header() {
             <Link href="/b">
               Contact
             </Link>
+          </li>
+          <li className='flex items-center cursor-pointer'>
+            <span className="icon-[line-md--sun-rising-loop]" style={{width: '1.2em', height: '1.2em',}} onClick={()=>toggleTheme()}></span>
           </li>
         </ul>
       </nav>
